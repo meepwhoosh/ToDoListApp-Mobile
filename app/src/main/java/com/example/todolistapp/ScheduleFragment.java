@@ -44,8 +44,8 @@ public class ScheduleFragment extends Fragment {
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences("user_prefs", Context.MODE_PRIVATE);
         String username = sharedPreferences.getString("username", "User");
 
-        // Gunakan binding untuk mengakses view
-        binding.tvHelloUserSchedule.setText(getString(R.string.hello_user, username));
+        // Gunakan binding untuk mengakses view dan set teks secara langsung
+        binding.tvHelloUserSchedule.setText("Hello, " + username + "!");
 
         // Tampilkan tanggal saat ini
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {

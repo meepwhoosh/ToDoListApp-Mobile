@@ -5,9 +5,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp"
+    android:background="#FFFFFF"
     tools:context=".ScheduleFragment">
 
-    <!-- Hello User dan Tanggal -->
+    <RelativeLayout
+        android:id="@+id/navbar_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
     <TextView
         android:id="@+id/tv_hello_user_schedule"
         android:layout_width="wrap_content"
@@ -24,6 +30,8 @@
         android:layout_marginTop="4dp"
         android:textSize="16sp"
         tools:text="Senin, 20 Oktober" />
+
+    </RelativeLayout>
 
     <!-- Konten yang sudah ada -->
     <LinearLayout
