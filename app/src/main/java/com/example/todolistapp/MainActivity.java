@@ -28,10 +28,10 @@ public class MainActivity extends AppCompatActivity {
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
-            if (itemId == R.id.nav_todo) {
+            if (itemId == R.id.navigation_home) {
                 replaceFragment(toDoFragment);
                 return true;
-            } else if (itemId == R.id.nav_schedule) {
+            } else if (itemId == R.id.navigation_schedule) {
                 replaceFragment(scheduleFragment);
                 return true;
             }

@@ -1,5 +1,6 @@
 package com.example.todolistapp;
 
+import android.content.Context;
 import android.graphics.Paint;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,29 +8,25 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
+import java.util.List;
 
-import com.example.todolistapp.R;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-
+/**
+ * File: ToDoAdapter.java
+ * Tugas Dede - Direvisi untuk menggunakan ToDoModel dan ToDoFragment.
+ */
 public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
 
-    public interface OnItemClickListener {
-        void onEditClick(HashMap<String, String> item);
-        void onDeleteClick(HashMap<String, String> item);
-        void onCheckedChange(HashMap<String, String> item, boolean isChecked);
-    }
+    private Context context;
+    private List<ToDoModel> todoList;
+    private ToDoFragment fragment; // Referensi ke fragment untuk callback
 
-    private ArrayList<HashMap<String, String>> todoList;
-    private final OnItemClickListener listener;
-
-    public ToDoAdapter(ArrayList<HashMap<String, String>> todoList, OnItemClickListener listener) {
+    public ToDoAdapter(Context context, List<ToDoModel> todoList, ToDoFragment fragment) {
+        this.context = context;
         this.todoList = todoList;
-        this.listener = listener;
+        this.fragment = fragment;
     }
 
     @NonNull
@@ -41,42 +38,54 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder h, int position) {
-        HashMap<String, String> item = todoList.get(position);
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        ToDoModel item = todoList.get(position);
 
-        String title = item.get("title");
-        String deadline = item.get("deadline");
-        String completed = item.get("completed");
+        holder.txtTitle.setText(item.getTaskName());
 
-        h.txtTitle.setText(title != null ? title : "(tidak ada judul)");
-        h.txtDeadline.setText(deadline != null && !deadline.isEmpty()
-                ? "Deadline: " + deadline
-                : "");
+        // Logika untuk menampilkan deadline
+        if (item.getDueDate() != null && !item.getDueDate().isEmpty()) {
+            holder.txtDeadline.setText("Deadline: " + item.getDueDate());
+            holder.txtDeadline.setVisibility(View.VISIBLE);
+        } else {
+            holder.txtDeadline.setVisibility(View.GONE);
+        }
 
-        boolean isChecked = completed != null && completed.equals("1");
+        // Logika untuk status (checkbox dan coretan)
+        boolean isCompleted = item.getStatus() == 1;
+        holder.checkTodo.setOnCheckedChangeListener(null); // Hindari trigger listener saat re-bind
+        holder.checkTodo.setChecked(isCompleted);
 
-        h.checkTodo.setOnCheckedChangeListener(null);
-        h.checkTodo.setChecked(isChecked);
-        h.txtTitle.setPaintFlags(isChecked ?
-                h.txtTitle.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG :
-                h.txtTitle.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
+        if (isCompleted) {
+            holder.txtTitle.setPaintFlags(holder.txtTitle.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+            holder.txtTitle.setTextColor(ContextCompat.getColor(context, android.R.color.darker_gray));
+        } else {
+            holder.txtTitle.setPaintFlags(holder.txtTitle.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
+            holder.txtTitle.setTextColor(ContextCompat.getColor(context, android.R.color.black));
+        }
 
-        h.checkTodo.setOnCheckedChangeListener((b, c) ->
-                listener.onCheckedChange(item, c));
+        // Set listener untuk checkbox
+        holder.checkTodo.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            int newStatus = isChecked ? 1 : 0;
+            fragment.updateTaskStatus(item.getId(), newStatus);
+        });
 
-        h.btnEdit.setOnClickListener(v -> listener.onEditClick(item));
-        h.btnDelete.setOnClickListener(v -> listener.onDeleteClick(item));
+        // (DIUPDATE) Set listener untuk tombol EDIT
+        holder.btnEdit.setOnClickListener(v -> {
+            fragment.showAddOrEditTodoDialog(item);
+        });
+
+        // Set listener untuk tombol DELETE
+        holder.btnDelete.setOnClickListener(v -> {
+            fragment.deleteTask(item.getId());
+        });
     }
 
     @Override
     public int getItemCount() {
-        return todoList != null ? todoList.size() : 0;
+        return todoList.size();
     }
 
-    public void updateList(ArrayList<HashMap<String, String>> newList) {
-        this.todoList = newList;
-        notifyDataSetChanged();
-    }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
         CheckBox checkTodo;

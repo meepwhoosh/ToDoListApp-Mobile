@@ -26,8 +26,12 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+    // Tambahkan blok ini untuk mengaktifkan View Binding
+    buildFeatures {
+        viewBinding = true
     }
 }
 
